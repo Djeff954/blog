@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finanças Inteligentes | Blog de Finanças Pessoais e Investimentos</title>
+    
+    <!-- Supabase JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e9edf2 100%);
+            color: #1a2a3a;
+            line-height: 1.6;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #0a2b3e 0%, #0d3b4f 100%);
+            color: white;
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logo h1 {
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #fff 0%, #ffd89b 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .logo p {
+            font-size: 0.85rem;
+            opacity: 0.9;
+            margin-top: 0.25rem;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .nav-menu a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            padding: 0.5rem 0;
+            position: relative;
+        }
+
+        .nav-menu a:hover {
+            color: #ffb347;
+        }
+
+        .nav-menu a.active {
+            color: #ffb347;
+        }
+
+        .nav-menu a.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #ffb347;
+        }
+
+        /* Barra de Pesquisa e Filtros */
+        .search-filter-section {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 0.3rem 0.8rem;
+            border-radius: 50px;
+            backdrop-filter: blur(10px);
+        }
+
+        .search-box {
+            position: relative;
+        }
+
+        .search-box input {
+            padding: 0.5rem 1rem 0.5rem 2rem;
+            border: none;
+            border-radius: 50px;
+            width: 200px;
+            font-size: 0.85rem;
+            outline: none;
+            background: rgba(255,255,255,0.9);
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 0.7rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+            font-size: 0.8rem;
+        }
+
+        .filter-select {
+            background: rgba(255,255,255,0.9);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            outline: none;
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, #0f3b4f 0%, #1a4d63 100%);
+            color: white;
+            padding: 4rem 0;
+            margin-bottom: 3rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="rgba(255,255,255,0.05)" d="M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,122.7C672,117,768,139,864,154.7C960,171,1056,181,1152,165.3C1248,149,1344,107,1392,85.3L1440,64L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>') no-repeat bottom;
+            background-size: cover;
+            opacity: 0.3;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .hero h2 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            font-weight: 800;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            opacity: 0.95;
+        }
+
+        .btn-primary {
+            background: #ffb347;
+            color: #0a2b3e;
+            padding: 0.8rem 2rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 700;
+            display: inline-block;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary:hover {
+            background: #ff9f1a;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        /* Posts Grid */
+        .section-title {
+            font-size: 2rem;
+            text-align: center;
+            margin-bottom: 3rem;
+            color: #0a2b3e;
+            font-weight: 700;
+        }
+
+        .posts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .post-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .post-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+
+        .post-image {
+            height: 200px;
+            background-size: cover;
+            background-position: center;
+            background-color: #f0f0f0;
+        }
+
+        .post-content {
+            padding: 1.5rem;
+        }
+
+        .post-category {
+            display: inline-block;
+            background: #ffb347;
+            color: #0a2b3e;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .post-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: #0a2b3e;
+        }
+
+        .post-excerpt {
+            color: #666;
+            margin-bottom: 1rem;
+            line-height: 1.5;
+        }
+
+        .post-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #999;
+            font-size: 0.85rem;
+        }
+
+        .read-more {
+            color: #ffb347;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        .read-more:hover {
+            color: #ff9f1a;
+        }
+
+        /* Newsletter Section */
+        .newsletter {
+            background: linear-gradient(135deg, #0a2b3e 0%, #0d3b4f 100%);
+            padding: 4rem 2rem;
+            border-radius: 30px;
+            margin: 3rem 0;
+            text-align: center;
+            color: white;
+        }
+
+        .newsletter h3 {
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+        }
+
+        .newsletter-form {
+            display: flex;
+            gap: 1rem;
+            max-width: 500px;
+            margin: 2rem auto 0;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .newsletter-form input {
+            flex: 1;
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            min-width: 250px;
+        }
+
+        .btn-secondary {
+            background: #ffb347;
+            color: #0a2b3e;
+            padding: 0.8rem 1.5rem;
+            border-radius: 50px;
+            border: none;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background: #ff9f1a;
+            transform: translateY(-2px);
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 3rem;
+            background: white;
+            border-radius: 20px;
+            color: #666;
+            grid-column: 1 / -1;
+        }
+
+        /* Footer */
+        .footer {
+            background: #0a2b3e;
+            color: white;
+            padding: 3rem 0 1.5rem;
+            margin-top: 3rem;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-section h4 {
+            margin-bottom: 1rem;
+            color: #ffb347;
+        }
+
+        .footer-section a {
+            color: #ccc;
+            text-decoration: none;
+            display: block;
+            margin-bottom: 0.5rem;
+            transition: color 0.3s ease;
+        }
+
+        .footer-section a:hover {
+            color: #ffb347;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .social-links a {
+            font-size: 1.5rem;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            color: #999;
+            font-size: 0.9rem;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 2000;
+            overflow-y: auto;
+        }
+
+        .modal-content {
+            background: white;
+            max-width: 800px;
+            margin: 3rem auto;
+            border-radius: 20px;
+            padding: 2rem;
+            position: relative;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #999;
+            transition: color 0.3s ease;
+        }
+
+        .close-modal:hover {
+            color: #333;
+        }
+
+        .modal-image {
+            width: 100%;
+            max-height: 300px;
+            object-fit: cover;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 1rem;
+            }
+            
+            .hero h2 {
+                font-size: 2rem;
+            }
+            
+            .posts-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav-menu {
+                gap: 1rem;
+            }
+            
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .search-filter-section {
+                margin-top: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <h1><i class="fas fa-chart-line"></i> Finanças Inteligentes</h1>
+                    <p>Invista com sabedoria, construa seu futuro</p>
+                </div>
+                <nav class="nav-menu">
+                    <a href="#" class="active" data-page="home">Início</a>
+                    <a href="#" data-page="sobre">Sobre</a>
+                    <a href="#" data-page="contato">Contato</a>
+                    <a href="#" data-page="privacidade">Privacidade</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h2>Transforme suas Finanças Pessoais</h2>
+                <p>Aprenda a investir, economizar e construir riqueza de forma inteligente. Conteúdo gratuito e de qualidade para sua independência financeira.</p>
+                <button class="btn-primary" onclick="scrollToNewsletter()">
+                    <i class="fas fa-envelope"></i> Receba Dicas Grátis
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="container">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 2rem;">
+            <h2 class="section-title" style="margin-bottom: 0;">📚 Últimos Artigos</h2>
+            <div class="search-filter-section">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" placeholder="Buscar posts..." onkeyup="filterPosts()">
+                </div>
+                <select id="categoryFilter" class="filter-select" onchange="filterPosts()">
+                    <option value="all">Todas categorias</option>
+                </select>
+            </div>
+        </div>
+        <div id="postsGrid" class="posts-grid">
+            <div style="text-align: center; padding: 2rem;">Carregando posts...</div>
+        </div>
+    </main>
+
+    <!-- Newsletter Section -->
+    <div class="container">
+        <div class="newsletter">
+            <h3><i class="fas fa-gem"></i> Newsletter Exclusiva</h3>
+            <p>Receba semanalmente as melhores estratégias de investimento e dicas de finanças pessoais direto no seu e-mail.</p>
+            <form class="newsletter-form" onsubmit="subscribeNewsletter(event)">
+                <input type="email" placeholder="Seu melhor e-mail" required>
+                <button type="submit" class="btn-secondary">Assinar Grátis</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>Sobre o Blog</h4>
+                    <p>Finanças Inteligentes é um blog dedicado a ajudar pessoas a alcançarem sua liberdade financeira através de educação de qualidade.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-youtube"></i></a>
+                        <a href="#"><i class="fab fa-linkedin"></i></a>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h4>Links Úteis</h4>
+                    <a href="#" data-page="home">Início</a>
+                    <a href="#" data-page="sobre">Sobre Nós</a>
+                    <a href="#" data-page="privacidade">Política de Privacidade</a>
+                    <a href="#" data-page="contato">Contato</a>
+                </div>
+                <div class="footer-section">
+                    <h4>Categorias</h4>
+                    <a href="#" onclick="filterByCategory('Investimentos'); return false;">Investimentos</a>
+                    <a href="#" onclick="filterByCategory('Planejamento'); return false;">Planejamento Financeiro</a>
+                    <a href="#" onclick="filterByCategory('Renda Extra'); return false;">Renda Extra</a>
+                    <a href="#" onclick="filterByCategory('Aposentadoria'); return false;">Aposentadoria</a>
+                </div>
+                <div class="footer-section">
+                    <h4>Contato</h4>
+                    <p><i class="fas fa-envelope"></i> contato@financasinteligentes.com</p>
+                    <p><i class="fas fa-phone"></i> (11) 98765-4321</p>
+                    <p><i class="fas fa-clock"></i> Seg-Sex: 9h às 18h</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Finanças Inteligentes - Todos os direitos reservados</p>
+                <p style="margin-top: 0.5rem;">📊 Invista com conhecimento, colha resultados sustentáveis</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Modal -->
+    <div id="postModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal()">&times;</span>
+            <div id="modalBody"></div>
+        </div>
+    </div>
+
+    <script>
+        // Configuração do Supabase
+        const SUPABASE_URL = 'https://mpzpwcnltdhikoqoblfd.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1wenB3Y25sdGRoaWtvcW9ibGZkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUyMTQxNDEsImV4cCI6MjA5MDc5MDE0MX0.ugAen0tLnhGEjeoS8a1gKlEyhhdbsFoPRxVip7lN3t4';
+        
+        const supabase = supabaseJs.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        let allPosts = [];
+        
+        // Carregar posts do Supabase
+        async function loadPosts() {
+            try {
+                const { data, error } = await supabase
+                    .from('posts')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+                
+                if (error) throw error;
+                
+                allPosts = data;
+                loadCategoryFilter();
+                filterPosts();
+            } catch (error) {
+                console.error('Erro ao carregar posts:', error);
+                document.getElementById('postsGrid').innerHTML = '<div class="no-results">Erro ao carregar posts. Tente novamente mais tarde.</div>';
+            }
+        }
+        
+        // Carregar categorias no filtro
+        function loadCategoryFilter() {
+            const categories = ['all', ...new Set(allPosts.map(post => post.category))];
+            const filterSelect = document.getElementById('categoryFilter');
+            
+            filterSelect.innerHTML = categories.map(cat => `
+                <option value="${cat}">${cat === 'all' ? 'Todas categorias' : cat}</option>
+            `).join('');
+        }
+        
+        // Filtrar posts
+        function filterPosts() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const category = document.getElementById('categoryFilter').value;
+            
+            let filtered = [...allPosts];
+            
+            if (category !== 'all') {
+                filtered = filtered.filter(post => post.category === category);
+            }
+            
+            if (searchTerm !== '') {
+                filtered = filtered.filter(post => 
+                    post.title.toLowerCase().includes(searchTerm) ||
+                    post.excerpt.toLowerCase().includes(searchTerm) ||
+                    (post.category && post.category.toLowerCase().includes(searchTerm))
+                );
+            }
+            
+            renderPosts(filtered);
+        }
+        
+        // Filtrar por categoria (usado pelos links do footer)
+        function filterByCategory(category) {
+            document.getElementById('categoryFilter').value = category;
+            filterPosts();
+            window.scrollTo({ top: 400, behavior: 'smooth' });
+        }
+        
+        // Renderizar posts
+        function renderPosts(posts) {
+            const postsGrid = document.getElementById('postsGrid');
+            
+            if (posts.length === 0) {
+                postsGrid.innerHTML = `
+                    <div class="no-results">
+                        <i class="fas fa-search" style="font-size: 3rem; color: #ccc; margin-bottom: 1rem;"></i>
+                        <h3>Nenhum post encontrado</h3>
+                        <p>Tente buscar por outro termo ou categoria</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            postsGrid.innerHTML = posts.map(post => `
+                <div class="post-card" onclick="openPost('${post.id}')">
+                    <div class="post-image" style="background-image: url('${post.image_url || 'https://via.placeholder.com/400x200?text=Finanças'}')"></div>
+                    <div class="post-content">
+                        <span class="post-category">${escapeHtml(post.category)}</span>
+                        <h3 class="post-title">${escapeHtml(post.title)}</h3>
+                        <p class="post-excerpt">${escapeHtml(post.excerpt.substring(0, 120))}...</p>
+                        <div class="post-meta">
+                            <span><i class="far fa-calendar"></i> ${new Date(post.date).toLocaleDateString('pt-BR')}</span>
+                            <span><i class="far fa-clock"></i> ${post.read_time || '5 min'}</span>
+                            <a href="#" class="read-more" onclick="event.stopPropagation(); openPost('${post.id}')">Ler mais →</a>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // Abrir post no modal
+        async function openPost(postId) {
+            const post = allPosts.find(p => p.id === postId);
+            if (!post) return;
+            
+            const modal = document.getElementById('postModal');
+            const modalBody = document.getElementById('modalBody');
+            
+            modalBody.innerHTML = `
+                ${post.image_url ? `<img src="${post.image_url}" alt="${post.title}" class="modal-image">` : ''}
+                <span class="post-category" style="margin-bottom: 1rem;">${post.category}</span>
+                <h2 style="color: #0a2b3e; margin-bottom: 1rem;">${escapeHtml(post.title)}</h2>
+                <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem; color: #666; font-size: 0.9rem;">
+                    <span><i class="far fa-calendar"></i> ${new Date(post.date).toLocaleDateString('pt-BR')}</span>
+                    <span><i class="far fa-clock"></i> ${post.read_time || '5 min'} de leitura</span>
+                </div>
+                <div style="line-height: 1.8; color: #333;">
+                    ${post.content}
+                </div>
+                <hr style="margin: 2rem 0;">
+                <div style="background: #f5f5f5; padding: 1rem; border-radius: 10px;">
+                    <p><strong>📚 Gostou deste artigo?</strong></p>
+                    <p>Compartilhe com amigos e familiares e ajude eles também a terem uma vida financeira saudável!</p>
+                    <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+                        <button class="btn-secondary" onclick="closeModal()">Fechar</button>
+                        <button class="btn-primary" onclick="scrollToNewsletter()">Receber mais conteúdos</button>
+                    </div>
+                </div>
+            `;
+            
+            modal.style.display = 'block';
+        }
+        
+        function closeModal() {
+            document.getElementById('postModal').style.display = 'none';
+        }
+        
+        function scrollToNewsletter() {
+            closeModal();
+            document.querySelector('.newsletter').scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        function subscribeNewsletter(event) {
+            event.preventDefault();
+            const email = event.target.querySelector('input').value;
+            if(email) {
+                alert(`Obrigado por se inscrever! Enviaremos dicas para ${email}`);
+                event.target.reset();
+            }
+        }
+        
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        // Navegação entre páginas
+        document.querySelectorAll('[data-page]').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const page = link.getAttribute('data-page');
+                
+                document.querySelectorAll('.nav-menu a').forEach(nav => nav.classList.remove('active'));
+                link.classList.add('active');
+                
+                if (page === 'home') {
+                    document.querySelector('main').style.display = 'block';
+                    document.querySelector('.hero').style.display = 'block';
+                    document.querySelector('.newsletter').style.display = 'block';
+                } else if (page === 'sobre') {
+                    document.querySelector('main').innerHTML = `
+                        <div class="page-card" style="background: white; border-radius: 28px; padding: 32px; box-shadow: 0 6px 14px rgba(0,0,0,0.03);">
+                            <h2 class="page-title" style="font-size: 2rem; margin-bottom: 24px; color: #0f2b3d;"><i class="fas fa-user-graduate"></i> Sobre o Blog</h2>
+                            <p>Somos apaixonados por educação financeira e acreditamos que todos podem alcançar independência com planejamento e conhecimento. O Finanças Inteligentes nasceu para descomplicar investimentos, ajudar pessoas a organizarem suas finanças e construírem um futuro próspero.</p><br>
+                            <p>Nossa missão: entregar conteúdo de qualidade, ético e baseado em dados reais, sem promessas milagrosas.</p>
+                        </div>
+                    `;
+                    document.querySelector('.hero').style.display = 'none';
+                    document.querySelector('.newsletter').style.display = 'block';
+                } else if (page === 'contato') {
+                    document.querySelector('main').innerHTML = `
+                        <div class="page-card" style="background: white; border-radius: 28px; padding: 32px; box-shadow: 0 6px 14px rgba(0,0,0,0.03);">
+                            <h2 class="page-title" style="font-size: 2rem; margin-bottom: 24px; color: #0f2b3e;"><i class="fas fa-envelope"></i> Contato</h2>
+                            <p>Dúvidas, sugestões ou parcerias? Fale conosco pelo e-mail: <strong>contato@financasinteligentes.com</strong></p>
+                            <p>Ou pelo telefone: (11) 98765-4321</p>
+                            <p>Respondemos em até 2 dias úteis.</p>
+                        </div>
+                    `;
+                    document.querySelector('.hero').style.display = 'none';
+                    document.querySelector('.newsletter').style.display = 'block';
+                } else if (page === 'privacidade') {
+                    document.querySelector('main').innerHTML = `
+                        <div class="page-card" style="background: white; border-radius: 28px; padding: 32px; box-shadow: 0 6px 14px rgba(0,0,0,0.03);">
+                            <h2 class="page-title" style="font-size: 2rem; margin-bottom: 24px; color: #0f2b3e;"><i class="fas fa-shield-alt"></i> Política de Privacidade</h2>
+                            <p>Seus dados são importantes para nós. Este blog não coleta informações pessoais sem consentimento. Utilizamos apenas armazenamento local para as postagens e não compartilhamos dados com terceiros.</p><br>
+                            <p>Os comentários e contatos são opcionais. Ao navegar, você concorda com nossa política de cookies apenas funcionais.</p>
+                        </div>
+                    `;
+                    document.querySelector('.hero').style.display = 'none';
+                    document.querySelector('.newsletter').style.display = 'block';
+                }
+            });
+        });
+        
+        // Fechar modal ao clicar fora
+        window.onclick = function(event) {
+            const modal = document.getElementById('postModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+        
+        // Inicializar
+        loadPosts();
+    </script>
+</body>
+</html>

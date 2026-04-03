@@ -1,0 +1,1028 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin | Finanças Inteligentes - Painel de Controle</title>
+    
+    <!-- Supabase JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- TinyMCE Editor -->
+    <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .admin-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Login Box */
+        .login-box {
+            max-width: 480px;
+            margin: 80px auto;
+            background: white;
+            border-radius: 30px;
+            padding: 3rem;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+            animation: slideUp 0.6s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .login-header i {
+            font-size: 3rem;
+            color: #ffb347;
+            margin-bottom: 1rem;
+        }
+
+        .login-header h2 {
+            color: #0a2b3e;
+            font-size: 1.8rem;
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+
+        .input-group i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 1rem 1rem 1rem 3rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #ffb347;
+        }
+
+        .btn-login {
+            width: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem;
+            border: none;
+            border-radius: 15px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        /* Header Admin */
+        .admin-header {
+            background: white;
+            border-radius: 25px;
+            padding: 1.5rem 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .admin-header h1 {
+            color: #0a2b3e;
+            font-size: 1.8rem;
+        }
+
+        .admin-header h1 i {
+            color: #ffb347;
+        }
+
+        .admin-stats {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 0.8rem 1.5rem;
+            border-radius: 20px;
+            text-align: center;
+            color: white;
+        }
+
+        .stat-number {
+            font-size: 1.8rem;
+            font-weight: 800;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            opacity: 0.9;
+        }
+
+        .btn-logout {
+            background: linear-gradient(135deg, #f56565 0%, #c53030 100%);
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-logout:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(197, 48, 48, 0.3);
+        }
+
+        /* Main Content */
+        .admin-main {
+            background: white;
+            border-radius: 25px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        /* Tabs */
+        .admin-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid #e0e0e0;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 0.8rem 1.8rem;
+            background: none;
+            border: none;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            color: #666;
+            transition: all 0.3s ease;
+            border-radius: 12px;
+        }
+
+        .tab-btn:hover {
+            color: #ffb347;
+            background: rgba(255, 179, 71, 0.1);
+        }
+
+        .tab-btn.active {
+            color: #ffb347;
+            background: rgba(255, 179, 71, 0.15);
+        }
+
+        /* Formulário */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #ffb347;
+            box-shadow: 0 0 0 3px rgba(255, 179, 71, 0.1);
+        }
+
+        /* Link de Imagem */
+        .image-link-area {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 1rem;
+        }
+
+        .image-preview {
+            max-width: 300px;
+            margin-top: 1rem;
+            border-radius: 12px;
+            overflow: hidden;
+            display: none;
+            background: #f8f9fa;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .image-preview img {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+        }
+
+        .btn-remove-image {
+            background: #dc2626;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 0.5rem;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-remove-image:hover {
+            background: #b91c1c;
+            transform: translateY(-1px);
+        }
+
+        /* Botões */
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 0.8rem 1.8rem;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-primary:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #f56565 0%, #c53030 100%);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(197, 48, 48, 0.4);
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+            color: white;
+        }
+
+        .btn-warning:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(217, 119, 6, 0.4);
+        }
+
+        /* Tabela */
+        .posts-table {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        th {
+            background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+            font-weight: 700;
+            color: #333;
+        }
+
+        tr {
+            transition: all 0.3s ease;
+        }
+
+        tr:hover {
+            background: #f7fafc;
+            transform: scale(1.01);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .action-buttons button {
+            padding: 0.5rem 1rem;
+            font-size: 0.85rem;
+        }
+
+        /* Alertas */
+        .alert {
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            display: none;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .alert.show {
+            display: block;
+        }
+
+        .alert-success {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            color: #065f46;
+            border-left: 4px solid #10b981;
+        }
+
+        .alert-error {
+            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+            color: #991b1b;
+            border-left: 4px solid #dc2626;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 25px;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 2rem;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #ffb347;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .help-text {
+            font-size: 0.8rem;
+            color: #666;
+            margin-top: 0.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .help-text i {
+            color: #ffb347;
+        }
+
+        @media (max-width: 768px) {
+            .admin-container {
+                padding: 1rem;
+            }
+            
+            .admin-header {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .admin-stats {
+                justify-content: center;
+            }
+            
+            th, td {
+                padding: 0.5rem;
+                font-size: 0.85rem;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .action-buttons button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Login Section -->
+        <div id="loginSection">
+            <div class="login-box">
+                <div class="login-header">
+                    <i class="fas fa-chart-line"></i>
+                    <h2>Painel Administrativo</h2>
+                    <p style="margin-top: 0.5rem; color: #666;">Faça login para gerenciar o blog</p>
+                </div>
+                <form id="loginForm">
+                    <div class="input-group">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" id="loginEmail" placeholder="E-mail" required>
+                    </div>
+                    <div class="input-group">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="loginPassword" placeholder="Senha" required>
+                    </div>
+                    <button type="submit" class="btn-login">
+                        <i class="fas fa-sign-in-alt"></i> Entrar
+                    </button>
+                </form>
+                <p style="text-align: center; margin-top: 1.5rem; font-size: 0.85rem; color: #999;">
+                    <i class="fas fa-shield-alt"></i> Acesso seguro com Supabase
+                </p>
+            </div>
+        </div>
+
+        <!-- Admin Panel -->
+        <div id="adminPanel" style="display: none;">
+            <div class="admin-header">
+                <h1><i class="fas fa-chart-line"></i> Finanças Inteligentes - Admin</h1>
+                <div class="admin-stats">
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalPosts">0</div>
+                        <div class="stat-label">Total de Posts</div>
+                    </div>
+                </div>
+                <button class="btn-logout" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i> Sair
+                </button>
+            </div>
+
+            <div class="admin-main">
+                <div id="alert" class="alert"></div>
+
+                <div class="admin-tabs">
+                    <button class="tab-btn active" onclick="switchTab('create')">
+                        <i class="fas fa-plus-circle"></i> Criar Post
+                    </button>
+                    <button class="tab-btn" onclick="switchTab('list')">
+                        <i class="fas fa-list"></i> Gerenciar Posts
+                    </button>
+                </div>
+
+                <!-- Create/Edit Tab -->
+                <div id="createTab">
+                    <h3 id="formTitle" style="margin-bottom: 1.5rem;">✏️ Criar Novo Post</h3>
+                    <form id="postForm">
+                        <input type="hidden" id="postId">
+                        
+                        <div class="form-group">
+                            <label>Título do Post *</label>
+                            <input type="text" id="postTitle" required placeholder="Ex: Como começar a investir com pouco dinheiro">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Categoria *</label>
+                            <select id="postCategory" required>
+                                <option value="">Selecione uma categoria</option>
+                                <option value="Investimentos">📈 Investimentos</option>
+                                <option value="Planejamento">📋 Planejamento Financeiro</option>
+                                <option value="Educação">🎓 Educação Financeira</option>
+                                <option value="Finanças">💰 Finanças Pessoais</option>
+                                <option value="Renda Extra">💼 Renda Extra</option>
+                                <option value="Aposentadoria">🏖️ Aposentadoria</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Link da Imagem de Destaque</label>
+                            <div class="image-link-area">
+                                <input type="url" id="imageUrl" placeholder="https://exemplo.com/imagem.jpg" style="width: 100%;">
+                                <div class="help-text">
+                                    <i class="fas fa-info-circle"></i>
+                                    <span>Cole o link direto da imagem (URL). Use imagens gratuitas como Unsplash, Pexels ou qualquer link público</span>
+                                </div>
+                                <button type="button" onclick="previewImageLink()" style="margin-top: 0.5rem; background: #667eea; color: white; border: none; padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer;">
+                                    <i class="fas fa-eye"></i> Visualizar Imagem
+                                </button>
+                            </div>
+                            <div class="image-preview" id="imagePreview">
+                                <img id="previewImg" src="" alt="Preview">
+                                <button type="button" class="btn-remove-image" onclick="removeImage()">
+                                    <i class="fas fa-trash"></i> Remover Imagem
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Resumo (Excerpt) *</label>
+                            <textarea id="postExcerpt" rows="3" required placeholder="Um breve resumo do post que aparecerá na página inicial..."></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Conteúdo Completo *</label>
+                            <textarea id="postContent" rows="10" required placeholder="Escreva o conteúdo completo do post aqui..."></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Tempo de leitura</label>
+                            <input type="text" id="postReadTime" placeholder="Ex: 5 min" value="5 min">
+                        </div>
+
+                        <div style="display: flex; gap: 1rem;">
+                            <button type="submit" class="btn-primary">
+                                <i class="fas fa-save"></i> Salvar Post
+                            </button>
+                            <button type="button" class="btn-warning" onclick="resetForm()">
+                                <i class="fas fa-undo"></i> Cancelar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- List Tab -->
+                <div id="listTab" style="display: none;">
+                    <h3 style="margin-bottom: 1.5rem;">📋 Gerenciar Posts</h3>
+                    <div class="posts-table">
+                        <div id="loadingPosts" class="loading" style="display: none;">
+                            <div class="spinner"></div>
+                            <p>Carregando posts...</p>
+                        </div>
+                        <div id="postsTableContainer"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Modal -->
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <h3><i class="fas fa-exclamation-triangle"></i> Confirmar Exclusão</h3>
+            <p>Tem certeza que deseja excluir este post? Esta ação não pode ser desfeita.</p>
+            <div class="modal-buttons">
+                <button class="btn-warning" onclick="closeDeleteModal()">Cancelar</button>
+                <button class="btn-danger" id="confirmDeleteBtn">Excluir</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==================== CONFIGURAÇÃO DO SUPABASE ====================
+        const SUPABASE_URL = 'https://mpzpwcnltdhikoqoblfd.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1wenB3Y25sdGRoaWtvcW9ibGZkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUyMTQxNDEsImV4cCI6MjA5MDc5MDE0MX0.ugAen0tLnhGEjeoS8a1gKlEyhhdbsFoPRxVip7lN3t4';
+        
+        const supabase = supabaseJs.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        let currentUser = null;
+        let currentDeleteId = null;
+        
+        // ==================== FUNÇÕES DE AUTENTICAÇÃO ====================
+        async function checkLoginStatus() {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session) {
+                currentUser = session.user;
+                showAdminPanel();
+                loadPosts();
+            } else {
+                showLogin();
+            }
+        }
+        
+        async function handleLogin(email, password) {
+            try {
+                const { data, error } = await supabase.auth.signInWithPassword({
+                    email: email,
+                    password: password
+                });
+                
+                if (error) throw error;
+                
+                currentUser = data.user;
+                showAdminPanel();
+                loadPosts();
+                showAlert('Login realizado com sucesso!', 'success');
+            } catch (error) {
+                showAlert('Erro ao fazer login: ' + error.message, 'error');
+            }
+        }
+        
+        async function logout() {
+            await supabase.auth.signOut();
+            currentUser = null;
+            showLogin();
+            showAlert('Você saiu do sistema', 'success');
+        }
+        
+        // ==================== FUNÇÕES DE IMAGEM ====================
+        function previewImageLink() {
+            const imageUrl = document.getElementById('imageUrl').value;
+            if (imageUrl && isValidUrl(imageUrl)) {
+                const preview = document.getElementById('previewImg');
+                const previewContainer = document.getElementById('imagePreview');
+                preview.src = imageUrl;
+                previewContainer.style.display = 'block';
+                
+                preview.onerror = function() {
+                    showAlert('A imagem não pôde ser carregada. Verifique o link.', 'error');
+                    previewContainer.style.display = 'none';
+                };
+            } else if (imageUrl) {
+                showAlert('Por favor, insira uma URL válida (ex: https://...)', 'error');
+            } else {
+                showAlert('Digite o link da imagem primeiro', 'error');
+            }
+        }
+        
+        function isValidUrl(string) {
+            try {
+                new URL(string);
+                return true;
+            } catch (_) {
+                return false;
+            }
+        }
+        
+        function removeImage() {
+            document.getElementById('imageUrl').value = '';
+            document.getElementById('previewImg').src = '';
+            document.getElementById('imagePreview').style.display = 'none';
+        }
+        
+        // ==================== CRUD DE POSTS ====================
+        async function loadPosts() {
+            const container = document.getElementById('postsTableContainer');
+            const loading = document.getElementById('loadingPosts');
+            
+            loading.style.display = 'block';
+            container.innerHTML = '';
+            
+            try {
+                const { data, error } = await supabase
+                    .from('posts')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+                
+                if (error) throw error;
+                
+                document.getElementById('totalPosts').textContent = data.length;
+                
+                if (data.length === 0) {
+                    container.innerHTML = '<p style="text-align: center; padding: 2rem;">Nenhum post cadastrado ainda. Crie seu primeiro post!</p>';
+                } else {
+                    const table = `
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Título</th>
+                                    <th>Categoria</th>
+                                    <th>Data</th>
+                                    <th>Imagem</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${data.map(post => `
+                                    <tr>
+                                        <td><strong>${escapeHtml(post.title)}</strong></td>
+                                        <td>${post.category}</td>
+                                        <td>${new Date(post.date).toLocaleDateString('pt-BR')}</td>
+                                        <td>${post.image_url ? '<i class="fas fa-check-circle" style="color: #10b981; font-size: 1.2rem;"></i>' : '<i class="fas fa-times-circle" style="color: #999;"></i>'}</td>
+                                        <td class="action-buttons">
+                                            <button class="btn-warning" onclick="editPost('${post.id}')">
+                                                <i class="fas fa-edit"></i> Editar
+                                            </button>
+                                            <button class="btn-danger" onclick="confirmDelete('${post.id}')">
+                                                <i class="fas fa-trash"></i> Excluir
+                                            </button>
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    `;
+                    container.innerHTML = table;
+                }
+            } catch (error) {
+                showAlert('Erro ao carregar posts: ' + error.message, 'error');
+            } finally {
+                loading.style.display = 'none';
+            }
+        }
+        
+        async function savePost(event) {
+            event.preventDefault();
+            
+            const id = document.getElementById('postId').value;
+            const title = document.getElementById('postTitle').value;
+            const category = document.getElementById('postCategory').value;
+            const excerpt = document.getElementById('postExcerpt').value;
+            let content = document.getElementById('postContent').value;
+            const readTime = document.getElementById('postReadTime').value || '5 min';
+            const imageUrl = document.getElementById('imageUrl').value;
+            
+            if (tinymce.activeEditor) {
+                content = tinymce.activeEditor.getContent();
+            }
+            
+            if (!title || !category || !excerpt || !content) {
+                showAlert('Preencha todos os campos obrigatórios!', 'error');
+                return;
+            }
+            
+            const postData = {
+                title,
+                category,
+                excerpt,
+                content,
+                read_time: readTime,
+                image_url: imageUrl || null,
+                date: new Date().toISOString(),
+                updated_at: new Date().toISOString()
+            };
+            
+            try {
+                if (id) {
+                    const { error } = await supabase
+                        .from('posts')
+                        .update(postData)
+                        .eq('id', id);
+                    
+                    if (error) throw error;
+                    showAlert('Post atualizado com sucesso!', 'success');
+                } else {
+                    const { error } = await supabase
+                        .from('posts')
+                        .insert([postData]);
+                    
+                    if (error) throw error;
+                    showAlert('Post criado com sucesso!', 'success');
+                }
+                
+                resetForm();
+                loadPosts();
+                switchTab('list');
+            } catch (error) {
+                showAlert('Erro ao salvar post: ' + error.message, 'error');
+            }
+        }
+        
+        async function editPost(id) {
+            try {
+                const { data, error } = await supabase
+                    .from('posts')
+                    .select('*')
+                    .eq('id', id)
+                    .single();
+                
+                if (error) throw error;
+                
+                document.getElementById('postId').value = data.id;
+                document.getElementById('postTitle').value = data.title;
+                document.getElementById('postCategory').value = data.category;
+                document.getElementById('postExcerpt').value = data.excerpt;
+                document.getElementById('postContent').value = data.content;
+                document.getElementById('postReadTime').value = data.read_time || '5 min';
+                
+                if (data.image_url) {
+                    document.getElementById('imageUrl').value = data.image_url;
+                    document.getElementById('previewImg').src = data.image_url;
+                    document.getElementById('imagePreview').style.display = 'block';
+                }
+                
+                if (tinymce.activeEditor) {
+                    tinymce.activeEditor.setContent(data.content);
+                }
+                
+                document.getElementById('formTitle').innerHTML = '✏️ Editar Post';
+                switchTab('create');
+            } catch (error) {
+                showAlert('Erro ao carregar post: ' + error.message, 'error');
+            }
+        }
+        
+        async function deletePost() {
+            if (!currentDeleteId) return;
+            
+            try {
+                const { error } = await supabase
+                    .from('posts')
+                    .delete()
+                    .eq('id', currentDeleteId);
+                
+                if (error) throw error;
+                
+                showAlert('Post excluído com sucesso!', 'success');
+                loadPosts();
+                closeDeleteModal();
+            } catch (error) {
+                showAlert('Erro ao excluir post: ' + error.message, 'error');
+            }
+        }
+        
+        // ==================== UTILITÁRIOS ====================
+        function showLogin() {
+            document.getElementById('loginSection').style.display = 'block';
+            document.getElementById('adminPanel').style.display = 'none';
+            
+            document.getElementById('loginForm').onsubmit = (e) => {
+                e.preventDefault();
+                const email = document.getElementById('loginEmail').value;
+                const password = document.getElementById('loginPassword').value;
+                handleLogin(email, password);
+            };
+        }
+        
+        function showAdminPanel() {
+            document.getElementById('loginSection').style.display = 'none';
+            document.getElementById('adminPanel').style.display = 'block';
+        }
+        
+        function switchTab(tab) {
+            const createTab = document.getElementById('createTab');
+            const listTab = document.getElementById('listTab');
+            const buttons = document.querySelectorAll('.tab-btn');
+            
+            if (tab === 'create') {
+                createTab.style.display = 'block';
+                listTab.style.display = 'none';
+                buttons[0].classList.add('active');
+                buttons[1].classList.remove('active');
+            } else {
+                createTab.style.display = 'none';
+                listTab.style.display = 'block';
+                buttons[0].classList.remove('active');
+                buttons[1].classList.add('active');
+                loadPosts();
+            }
+        }
+        
+        function resetForm() {
+            document.getElementById('postForm').reset();
+            document.getElementById('postId').value = '';
+            document.getElementById('formTitle').innerHTML = '✏️ Criar Novo Post';
+            removeImage();
+            if (tinymce.activeEditor) {
+                tinymce.activeEditor.setContent('');
+            }
+        }
+        
+        function confirmDelete(id) {
+            currentDeleteId = id;
+            document.getElementById('deleteModal').style.display = 'flex';
+        }
+        
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').style.display = 'none';
+            currentDeleteId = null;
+        }
+        
+        function showAlert(message, type) {
+            const alertDiv = document.getElementById('alert');
+            alertDiv.textContent = message;
+            alertDiv.className = `alert alert-${type} show`;
+            setTimeout(() => {
+                alertDiv.classList.remove('show');
+            }, 3000);
+        }
+        
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        function setupTinyMCE() {
+            tinymce.init({
+                selector: '#postContent',
+                height: 400,
+                menubar: true,
+                plugins: [
+                    'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+                    'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+                    'insertdatetime', 'media', 'table', 'help', 'wordcount'
+                ],
+                toolbar: 'undo redo | blocks | bold italic backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | help',
+                content_style: 'body { font-family: Inter, sans-serif; font-size: 16px; line-height: 1.6; }'
+            });
+        }
+        
+        // Event Listeners
+        document.getElementById('postForm').addEventListener('submit', savePost);
+        document.getElementById('confirmDeleteBtn').addEventListener('click', deletePost);
+        
+        window.onclick = (event) => {
+            const modal = document.getElementById('deleteModal');
+            if (event.target === modal) closeDeleteModal();
+        };
+        
+        // Inicialização
+        setupTinyMCE();
+        checkLoginStatus();
+    </script>
+</body>
+</html>
