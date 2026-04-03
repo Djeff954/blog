@@ -340,19 +340,9 @@
             color: white;
         }
 
-        .btn-danger:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(197, 48, 48, 0.4);
-        }
-
         .btn-warning {
             background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
             color: white;
-        }
-
-        .btn-warning:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(217, 119, 6, 0.4);
         }
 
         /* Tabela */
@@ -789,7 +779,15 @@
                     .select('*')
                     .order('created_at', { ascending: false });
                 
-                if (error) throw error;
+                if (error) {
+                    console.error('Erro ao carregar posts:', error);
+                    if (error.message.includes('relation') && error.message.includes('does not exist')) {
+                        container.innerHTML = '<p style="text-align: center; padding: 2rem; color: #dc2626;">❌ A tabela "posts" não existe no Supabase. Execute o SQL fornecido para criar a tabela.</p>';
+                    } else {
+                        container.innerHTML = '<p style="text-align: center; padding: 2rem; color: #dc2626;">❌ Erro ao carregar posts: ' + error.message + '</p>';
+                    }
+                    return;
+                }
                 
                 document.getElementById('totalPosts').textContent = data.length;
                 
@@ -830,7 +828,8 @@
                     container.innerHTML = table;
                 }
             } catch (error) {
-                showAlert('Erro ao carregar posts: ' + error.message, 'error');
+                console.error('Erro:', error);
+                container.innerHTML = '<p style="text-align: center; padding: 2rem; color: #dc2626;">❌ Erro ao carregar posts. Verifique sua conexão com o Supabase.</p>';
             } finally {
                 loading.style.display = 'none';
             }
