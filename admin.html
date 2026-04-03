@@ -14,30 +14,32 @@
 
 <body class="bg-gray-100">
 
-  <!-- LOGIN -->
-  <div id="loginSection" class="min-h-screen flex items-center justify-center">
-    <div class="bg-white shadow-lg rounded-lg p-8 w-full max-w-md">
-      <h2 class="text-2xl font-bold mb-6 text-center">Acesso ao Painel</h2>
+  <!-- PROTEÇÃO CONTRA ACESSO DIRETO -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const supabaseUrl = "https://etnrtknzieulkbatgnoz.supabase.co";
+    const supabaseKey = "sb_publishable_WLEOxOgv1edIDZEbZJCC4w_Q2wA3Cfm";
+    const supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
-      <input id="email" type="email" placeholder="Email"
-        class="w-full mb-4 px-4 py-3 border rounded-lg">
-
-      <input id="password" type="password" placeholder="Senha"
-        class="w-full mb-4 px-4 py-3 border rounded-lg">
-
-      <button onclick="login()"
-        class="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700">
-        Entrar
-      </button>
-
-      <p id="loginError" class="text-red-600 text-center mt-4 hidden">Credenciais inválidas</p>
-    </div>
-  </div>
+    // Bloqueia acesso direto
+    supabase.auth.getSession().then(({ data }) => {
+      if (!data.session) {
+        window.location.href = "login.html";
+      }
+    });
+  </script>
 
   <!-- PAINEL ADMIN -->
-  <div id="adminSection" class="hidden max-w-4xl mx-auto py-10 px-4">
+  <div id="adminSection" class="max-w-4xl mx-auto py-10 px-4">
 
-    <h1 class="text-3xl font-bold mb-8 text-center">Painel de Administração</h1>
+    <div class="flex justify-between items-center mb-10">
+      <h1 class="text-3xl font-bold">Painel de Administração</h1>
+
+      <button onclick="logout()"
+        class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700">
+        Sair
+      </button>
+    </div>
 
     <!-- FORMULÁRIO DE NOVO POST -->
     <div class="bg-white shadow-lg rounded-lg p-6 mb-10">
@@ -72,35 +74,7 @@
 
   </div>
 
-  <!-- SUPABASE -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
   <script>
-    const supabaseUrl = "https://etnrtknzieulkbatgnoz.supabase.co";
-    const supabaseKey = "sb_publishable_WLEOxOgv1edIDZEbZJCC4w_Q2wA3Cfm";
-    const supabase = supabase.createClient(supabaseUrl, supabaseKey);
-
-    // LOGIN
-    async function login() {
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
-
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password
-      });
-
-      if (error) {
-        document.getElementById("loginError").classList.remove("hidden");
-        return;
-      }
-
-      document.getElementById("loginSection").classList.add("hidden");
-      document.getElementById("adminSection").classList.remove("hidden");
-
-      carregarPosts();
-    }
-
     // CRIAR POST
     async function criarPost() {
       const titulo = document.getElementById("titulo").value;
@@ -157,7 +131,7 @@
       carregarPosts();
     }
 
-    // EDITAR POST (abre prompt simples)
+    // EDITAR POST (prompt simples)
     async function editarPost(id) {
       const novoTitulo = prompt("Novo título:");
       if (!novoTitulo) return;
@@ -165,6 +139,14 @@
       await supabase.from("posts").update({ titulo: novoTitulo }).eq("id", id);
       carregarPosts();
     }
+
+    // LOGOUT
+    async function logout() {
+      await supabase.auth.signOut();
+      window.location.href = "login.html";
+    }
+
+    carregarPosts();
   </script>
 
 </body>
