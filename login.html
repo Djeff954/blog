@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login | Admin</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+
+  <div class="bg-white shadow-lg rounded-lg p-8 w-full max-w-md">
+    <h2 class="text-2xl font-bold mb-6 text-center">Acesso ao Painel</h2>
+
+    <input id="email" type="email" placeholder="Email"
+      class="w-full mb-4 px-4 py-3 border rounded-lg">
+
+    <input id="password" type="password" placeholder="Senha"
+      class="w-full mb-4 px-4 py-3 border rounded-lg">
+
+    <button onclick="login()"
+      class="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700">
+      Entrar
+    </button>
+
+    <p id="loginError" class="text-red-600 text-center mt-4 hidden">Credenciais inválidas</p>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <script>
+    const supabaseUrl = "https://SEU-PROJETO.supabase.co";
+    const supabaseKey = "SEU-ANON-KEY";
+    const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+    async function login() {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      });
+
+      if (error) {
+        document.getElementById("loginError").classList.remove("hidden");
+        return;
+      }
+
+      // Login OK → redireciona para admin
+      window.location.href = "admin.html";
+    }
+  </script>
+
+</body>
+</html>
