@@ -39,7 +39,7 @@
         /* Login Box */
         .login-box {
             max-width: 480px;
-            margin: 80px auto;
+            margin: 60px auto;
             background: white;
             border-radius: 30px;
             padding: 3rem;
@@ -117,6 +117,42 @@
         .btn-login:hover {
             transform: translateY(-2px);
             box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #a0aec0 0%, #718096 100%);
+            margin-top: 1rem;
+        }
+
+        .divider {
+            text-align: center;
+            margin: 1.5rem 0;
+            position: relative;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: 45%;
+            height: 1px;
+            background: #e0e0e0;
+        }
+
+        .divider::before {
+            left: 0;
+        }
+
+        .divider::after {
+            right: 0;
+        }
+
+        .divider span {
+            background: white;
+            padding: 0 1rem;
+            color: #999;
+            font-size: 0.85rem;
         }
 
         /* Header Admin */
@@ -285,12 +321,6 @@
             cursor: pointer;
             margin-top: 0.5rem;
             font-size: 0.85rem;
-            transition: all 0.3s ease;
-        }
-
-        .btn-remove-image:hover {
-            background: #b91c1c;
-            transform: translateY(-1px);
         }
 
         /* Botões */
@@ -304,23 +334,6 @@
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .btn-primary::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            transition: left 0.5s;
-        }
-
-        .btn-primary:hover::before {
-            left: 100%;
         }
 
         .btn-primary:hover {
@@ -333,19 +346,9 @@
             color: white;
         }
 
-        .btn-danger:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(197, 48, 48, 0.4);
-        }
-
         .btn-warning {
             background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
             color: white;
-        }
-
-        .btn-warning:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(217, 119, 6, 0.4);
         }
 
         /* Tabela */
@@ -370,13 +373,8 @@
             color: #333;
         }
 
-        tr {
-            transition: all 0.3s ease;
-        }
-
         tr:hover {
             background: #f7fafc;
-            transform: scale(1.01);
         }
 
         .action-buttons {
@@ -437,7 +435,6 @@
             z-index: 1000;
             justify-content: center;
             align-items: center;
-            animation: fadeIn 0.3s ease-out;
         }
 
         .modal-content {
@@ -446,7 +443,6 @@
             padding: 2rem;
             max-width: 500px;
             width: 90%;
-            animation: slideUp 0.3s ease-out;
         }
 
         .modal-buttons {
@@ -503,11 +499,6 @@
                 justify-content: center;
             }
             
-            th, td {
-                padding: 0.5rem;
-                font-size: 0.85rem;
-            }
-            
             .action-buttons {
                 flex-direction: column;
             }
@@ -541,9 +532,54 @@
                         <i class="fas fa-sign-in-alt"></i> Entrar
                     </button>
                 </form>
+                
+                <div class="divider">
+                    <span>ou</span>
+                </div>
+                
+                <button class="btn-login btn-secondary" onclick="showRegisterForm()">
+                    <i class="fas fa-user-plus"></i> Criar nova conta
+                </button>
+                
                 <p style="text-align: center; margin-top: 1.5rem; font-size: 0.85rem; color: #999;">
                     <i class="fas fa-shield-alt"></i> Acesso seguro com Supabase
                 </p>
+            </div>
+        </div>
+
+        <!-- Register Section -->
+        <div id="registerSection" style="display: none;">
+            <div class="login-box">
+                <div class="login-header">
+                    <i class="fas fa-user-plus"></i>
+                    <h2>Criar Conta Admin</h2>
+                    <p style="margin-top: 0.5rem; color: #666;">Crie sua conta para acessar o painel</p>
+                </div>
+                <form id="registerForm">
+                    <div class="input-group">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" id="registerEmail" placeholder="E-mail" required>
+                    </div>
+                    <div class="input-group">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="registerPassword" placeholder="Senha (mínimo 6 caracteres)" required>
+                    </div>
+                    <div class="input-group">
+                        <i class="fas fa-check-circle"></i>
+                        <input type="password" id="confirmPassword" placeholder="Confirmar senha" required>
+                    </div>
+                    <button type="submit" class="btn-login">
+                        <i class="fas fa-user-check"></i> Criar conta
+                    </button>
+                </form>
+                
+                <div class="divider">
+                    <span>ou</span>
+                </div>
+                
+                <button class="btn-login btn-secondary" onclick="showLoginForm()">
+                    <i class="fas fa-sign-in-alt"></i> Voltar para o login
+                </button>
             </div>
         </div>
 
@@ -604,7 +640,7 @@
                                 <input type="url" id="imageUrl" placeholder="https://exemplo.com/imagem.jpg" style="width: 100%;">
                                 <div class="help-text">
                                     <i class="fas fa-info-circle"></i>
-                                    <span>Cole o link direto da imagem (URL). Use imagens gratuitas como Unsplash, Pexels ou qualquer link público</span>
+                                    <span>Cole o link direto da imagem (URL)</span>
                                 </div>
                                 <button type="button" onclick="previewImageLink()" style="margin-top: 0.5rem; background: #667eea; color: white; border: none; padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer;">
                                     <i class="fas fa-eye"></i> Visualizar Imagem
@@ -689,7 +725,7 @@
                 showAdminPanel();
                 loadPosts();
             } else {
-                showLogin();
+                showLoginForm();
             }
         }
         
@@ -711,11 +747,78 @@
             }
         }
         
+        async function handleRegister(email, password, confirmPassword) {
+            if (password !== confirmPassword) {
+                showAlert('As senhas não coincidem!', 'error');
+                return;
+            }
+            
+            if (password.length < 6) {
+                showAlert('A senha deve ter no mínimo 6 caracteres!', 'error');
+                return;
+            }
+            
+            try {
+                const { data, error } = await supabase.auth.signUp({
+                    email: email,
+                    password: password,
+                    options: {
+                        data: {
+                            role: 'admin'
+                        }
+                    }
+                });
+                
+                if (error) throw error;
+                
+                if (data.user) {
+                    showAlert('Conta criada com sucesso! Agora você pode fazer login.', 'success');
+                    showLoginForm();
+                }
+            } catch (error) {
+                showAlert('Erro ao criar conta: ' + error.message, 'error');
+            }
+        }
+        
         async function logout() {
             await supabase.auth.signOut();
             currentUser = null;
-            showLogin();
+            showLoginForm();
             showAlert('Você saiu do sistema', 'success');
+        }
+        
+        // ==================== FUNÇÕES DE UI ====================
+        function showLoginForm() {
+            document.getElementById('loginSection').style.display = 'block';
+            document.getElementById('registerSection').style.display = 'none';
+            document.getElementById('adminPanel').style.display = 'none';
+            
+            document.getElementById('loginForm').onsubmit = (e) => {
+                e.preventDefault();
+                const email = document.getElementById('loginEmail').value;
+                const password = document.getElementById('loginPassword').value;
+                handleLogin(email, password);
+            };
+        }
+        
+        function showRegisterForm() {
+            document.getElementById('loginSection').style.display = 'none';
+            document.getElementById('registerSection').style.display = 'block';
+            document.getElementById('adminPanel').style.display = 'none';
+            
+            document.getElementById('registerForm').onsubmit = (e) => {
+                e.preventDefault();
+                const email = document.getElementById('registerEmail').value;
+                const password = document.getElementById('registerPassword').value;
+                const confirm = document.getElementById('confirmPassword').value;
+                handleRegister(email, password, confirm);
+            };
+        }
+        
+        function showAdminPanel() {
+            document.getElementById('loginSection').style.display = 'none';
+            document.getElementById('registerSection').style.display = 'none';
+            document.getElementById('adminPanel').style.display = 'block';
         }
         
         // ==================== FUNÇÕES DE IMAGEM ====================
@@ -732,7 +835,7 @@
                     previewContainer.style.display = 'none';
                 };
             } else if (imageUrl) {
-                showAlert('Por favor, insira uma URL válida (ex: https://...)', 'error');
+                showAlert('Por favor, insira uma URL válida', 'error');
             } else {
                 showAlert('Digite o link da imagem primeiro', 'error');
             }
@@ -791,7 +894,7 @@
                                         <td><strong>${escapeHtml(post.title)}</strong></td>
                                         <td>${post.category}</td>
                                         <td>${new Date(post.date).toLocaleDateString('pt-BR')}</td>
-                                        <td>${post.image_url ? '<i class="fas fa-check-circle" style="color: #10b981; font-size: 1.2rem;"></i>' : '<i class="fas fa-times-circle" style="color: #999;"></i>'}</td>
+                                        <td>${post.image_url ? '<i class="fas fa-check-circle" style="color: #10b981; font-size: 1.2rem;"></i>' : '-'}</td>
                                         <td class="action-buttons">
                                             <button class="btn-warning" onclick="editPost('${post.id}')">
                                                 <i class="fas fa-edit"></i> Editar
@@ -925,23 +1028,6 @@
         }
         
         // ==================== UTILITÁRIOS ====================
-        function showLogin() {
-            document.getElementById('loginSection').style.display = 'block';
-            document.getElementById('adminPanel').style.display = 'none';
-            
-            document.getElementById('loginForm').onsubmit = (e) => {
-                e.preventDefault();
-                const email = document.getElementById('loginEmail').value;
-                const password = document.getElementById('loginPassword').value;
-                handleLogin(email, password);
-            };
-        }
-        
-        function showAdminPanel() {
-            document.getElementById('loginSection').style.display = 'none';
-            document.getElementById('adminPanel').style.display = 'block';
-        }
-        
         function switchTab(tab) {
             const createTab = document.getElementById('createTab');
             const listTab = document.getElementById('listTab');
