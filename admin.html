@@ -340,9 +340,19 @@
             color: white;
         }
 
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(197, 48, 48, 0.4);
+        }
+
         .btn-warning {
             background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
             color: white;
+        }
+
+        .btn-warning:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(217, 119, 6, 0.4);
         }
 
         /* Tabela */
@@ -598,7 +608,7 @@
                                 <input type="url" id="imageUrl" placeholder="https://exemplo.com/imagem.jpg" style="width: 100%;">
                                 <div class="help-text">
                                     <i class="fas fa-info-circle"></i>
-                                    <span>Cole o link direto da imagem (URL). Use imagens gratuitas como Unsplash, Pexels ou qualquer link público</span>
+                                    <span>Cole o link direto da imagem (URL)</span>
                                 </div>
                                 <button type="button" onclick="previewImageLink()" style="margin-top: 0.5rem; background: #667eea; color: white; border: none; padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer;">
                                     <i class="fas fa-eye"></i> Visualizar Imagem
@@ -800,10 +810,10 @@
                             <tbody>
                                 ${data.map(post => `
                                     <tr>
-                                        <td><strong>${escapeHtml(post.title)}</strong></td>
-                                        <td>${post.category}</td>
-                                        <td>${new Date(post.date).toLocaleDateString('pt-BR')}</td>
-                                        <td>${post.image_url ? '<i class="fas fa-check-circle" style="color: #10b981; font-size: 1.2rem;"></i>' : '<i class="fas fa-times-circle" style="color: #999;"></i>'}</td>
+                                        <td><strong>${escapeHtml(post.title)}</strong></td
+                                        <td>${post.category}</td
+                                        <td>${new Date(post.date).toLocaleDateString('pt-BR')}</td
+                                        <td>${post.image_url ? '<i class="fas fa-check-circle" style="color: #10b981; font-size: 1.2rem;"></i>' : '<i class="fas fa-times-circle" style="color: #999;"></i>'}</td
                                         <td class="action-buttons">
                                             <button class="btn-warning" onclick="editPost('${post.id}')">
                                                 <i class="fas fa-edit"></i> Editar
