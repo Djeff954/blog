@@ -587,43 +587,42 @@
     </section>
 
     <!-- Contato (MODIFICADO - sem redirecionamento) -->
-    <section id="contato" class="bg-soft">
-      <div class="container">
-        <div style="text-align: center;">
-          <h2>Vamos conversar?</h2>
-          <div class="divider"></div>
-          <p class="section-subtitle">Agende uma aula experimental ou tire suas dúvidas com nossa equipe.</p>
-        </div>
-        <div class="contact-flex">
-          <div class="contact-info">
-            <div style="margin-bottom: 2rem;"><i class="fas fa-map-marker-alt gold-text" style="font-size: 1.8rem;"></i><h3>Visite-nos</h3><p>Av. Brigadeiro Faria Lima, 1500 - Jardim Paulista, São Paulo - SP</p></div>
-            <div style="margin-bottom: 2rem;"><i class="fas fa-phone-alt gold-text" style="font-size: 1.8rem;"></i><h3>Ligue já</h3><p>(11) 3456-7890 | (11) 98765-4321</p></div>
-            <div><i class="fas fa-envelope gold-text" style="font-size: 1.8rem;"></i><h3>E-mail</h3><p>contato@forma-fitness.com.br</p></div>
-            <div class="social-icons" style="margin-top: 2rem;"><a href="#"><i class="fab fa-instagram"></i></a><a href="#"><i class="fab fa-facebook-f"></i></a><a href="#"><i class="fab fa-youtube"></i></a></div>
-          </div>
-          <div class="contact-form">
-            <!-- FORMULÁRIO COM FORMSUBMIT E ENVIO VIA AJAX (sem redirecionamento) -->
-            <form id="contactForm" action="https://formsubmit.co/djeffdinanga1@gmail.com" method="POST">
-              <!-- Proteção anti-spam -->
-              <input type="hidden" name="_captcha" value="true">
-              <!-- Impedir redirecionamento (capturado pelo AJAX) -->
-              <input type="hidden" name="_next" value="stay">
-              
-              <div class="form-group">
-                <input type="text" name="nome" id="nome" placeholder="Seu nome completo" required>
-              </div>
-              <div class="form-group">
-                <input type="email" name="email" id="email" placeholder="Seu melhor e-mail" required>
-              </div>
-              <div class="form-group">
-                <textarea rows="4" name="mensagem" id="mensagem" placeholder="Como podemos ajudar? Quer agendar uma aula?"></textarea>
-              </div>
-              <button type="submit" class="btn btn-primary" style="width:100%">Enviar mensagem <i class="fas fa-paper-plane"></i></button>
-            </form>
-          </div>
-        </div>
+    <!-- Contato (VERSÃO CORRIGIDA COM CÓDIGO DE ATIVAÇÃO) -->
+<section id="contato" class="bg-soft">
+  <div class="container">
+    <div style="text-align: center;">
+      <h2>Vamos conversar?</h2>
+      <div class="divider"></div>
+      <p class="section-subtitle">Agende uma aula experimental ou tire suas dúvidas com nossa equipe.</p>
+    </div>
+    <div class="contact-flex">
+      <div class="contact-info">
+        <div style="margin-bottom: 2rem;"><i class="fas fa-map-marker-alt gold-text" style="font-size: 1.8rem;"></i><h3>Visite-nos</h3><p>Av. Brigadeiro Faria Lima, 1500 - Jardim Paulista, São Paulo - SP</p></div>
+        <div style="margin-bottom: 2rem;"><i class="fas fa-phone-alt gold-text" style="font-size: 1.8rem;"></i><h3>Ligue já</h3><p>(11) 3456-7890 | (11) 98765-4321</p></div>
+        <div><i class="fas fa-envelope gold-text" style="font-size: 1.8rem;"></i><h3>E-mail</h3><p>contato@forma-fitness.com.br</p></div>
+        <div class="social-icons" style="margin-top: 2rem;"><a href="#"><i class="fab fa-instagram"></i></a><a href="#"><i class="fab fa-facebook-f"></i></a><a href="#"><i class="fab fa-youtube"></i></a></div>
       </div>
-    </section>
+      <div class="contact-form">
+        <!-- SUBSTITUA A STRING ABAIXO PELO CÓDIGO DO SEU EMAIL DE ATIVAÇÃO -->
+        <form id="contactForm" action="https://formsubmit.co/6553d7377de60642646a90c48f25297b" method="POST">
+          <input type="hidden" name="_captcha" value="true">
+          <input type="hidden" name="_next" value="stay">
+          
+          <div class="form-group">
+            <input type="text" name="nome" id="nome" placeholder="Seu nome completo" required>
+          </div>
+          <div class="form-group">
+            <input type="email" name="email" id="email" placeholder="Seu melhor e-mail" required>
+          </div>
+          <div class="form-group">
+            <textarea rows="4" name="mensagem" id="mensagem" placeholder="Como podemos ajudar? Quer agendar uma aula?"></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary" style="width:100%">Enviar mensagem <i class="fas fa-paper-plane"></i></button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
   </main>
 
   <footer>
