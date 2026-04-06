@@ -431,6 +431,38 @@
       margin: 0.5rem auto 2rem;
       border-radius: 4px;
     }
+
+    /* Estilos para o toast de notificação */
+    .toast-notification {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      background: #1e1f2c;
+      color: white;
+      padding: 1rem 1.8rem;
+      border-radius: 50px;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 500;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      z-index: 9999;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.3s ease;
+      pointer-events: none;
+    }
+    .toast-notification.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .toast-notification.success {
+      background: #2e7d32;
+      border-left: 4px solid #c8a86b;
+    }
+    .toast-notification.error {
+      background: #c62828;
+      border-left: 4px solid #ffb74d;
+    }
   </style>
 </head>
 <body>
@@ -554,7 +586,7 @@
       </div>
     </section>
 
-    <!-- Contato (MODIFICADO - com FormSubmit) -->
+    <!-- Contato (MODIFICADO - sem redirecionamento) -->
     <section id="contato" class="bg-soft">
       <div class="container">
         <div style="text-align: center;">
@@ -570,23 +602,21 @@
             <div class="social-icons" style="margin-top: 2rem;"><a href="#"><i class="fab fa-instagram"></i></a><a href="#"><i class="fab fa-facebook-f"></i></a><a href="#"><i class="fab fa-youtube"></i></a></div>
           </div>
           <div class="contact-form">
-            <!-- FORMULÁRIO MODIFICADO COM FORMSUBMIT -->
-            <form action="https://formsubmit.co/djeffdinanga1@gmail.com" method="POST">
-              <!-- Proteção anti-spam (opcional mas recomendado) -->
+            <!-- FORMULÁRIO COM FORMSUBMIT E ENVIO VIA AJAX (sem redirecionamento) -->
+            <form id="contactForm" action="https://formsubmit.co/djeffdinanga1@gmail.com" method="POST">
+              <!-- Proteção anti-spam -->
               <input type="hidden" name="_captcha" value="true">
-              <!-- Redirecionamento após envio (volta para o site) -->
-              <input type="hidden" name="_next" value="">
-              <!-- Campo para o email do visitante (necessário para o reply) -->
-              <input type="hidden" name="_replyto" value="email">
+              <!-- Impedir redirecionamento (capturado pelo AJAX) -->
+              <input type="hidden" name="_next" value="stay">
               
               <div class="form-group">
-                <input type="text" name="nome" placeholder="Seu nome completo" required>
+                <input type="text" name="nome" id="nome" placeholder="Seu nome completo" required>
               </div>
               <div class="form-group">
-                <input type="email" name="email" placeholder="Seu melhor e-mail" required>
+                <input type="email" name="email" id="email" placeholder="Seu melhor e-mail" required>
               </div>
               <div class="form-group">
-                <textarea rows="4" name="mensagem" placeholder="Como podemos ajudar? Quer agendar uma aula?"></textarea>
+                <textarea rows="4" name="mensagem" id="mensagem" placeholder="Como podemos ajudar? Quer agendar uma aula?"></textarea>
               </div>
               <button type="submit" class="btn btn-primary" style="width:100%">Enviar mensagem <i class="fas fa-paper-plane"></i></button>
             </form>
@@ -604,13 +634,15 @@
     </div>
   </footer>
 
+  <!-- Toast de notificação (elemento flutuante) -->
+  <div id="toastNotification" class="toast-notification"></div>
+
   <script>
     // Menu mobile
     const hamburger = document.getElementById('hamburger');
     const navMenu = document.getElementById('nav-menu');
     hamburger.addEventListener('click', () => {
       navMenu.classList.toggle('active');
-      // alterna ícone
       const icon = hamburger.querySelector('i');
       if (navMenu.classList.contains('active')) {
         icon.classList.remove('fa-bars');
@@ -648,22 +680,57 @@
       });
     });
 
-    // MENSAGEM DE CONFIRMAÇÃO VISUAL (MODIFICADA - não bloqueia o envio)
-    const form = document.querySelector('#contato form');
-    if(form) {
-      form.addEventListener('submit', (e) => {
-        // Não usamos preventDefault() para deixar o FormSubmit agir
-        setTimeout(() => {
-          alert('✨ Mensagem enviada! Entraremos em contato em breve. ✨');
-          form.reset();
-        }, 100);
+    // Função para mostrar notificação estilo toast
+    function showToast(message, type = 'success') {
+      const toast = document.getElementById('toastNotification');
+      toast.textContent = message;
+      toast.className = `toast-notification ${type}`;
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 4000);
+    }
+
+    // ENVIO DO FORMULÁRIO VIA AJAX (SEM REDIRECIONAMENTO)
+    const contactForm = document.getElementById('contactForm');
+    if (contactForm) {
+      contactForm.addEventListener('submit', async function(e) {
+        e.preventDefault(); // Impede o redirecionamento
+        
+        const formData = new FormData(contactForm);
+        const submitButton = contactForm.querySelector('button[type="submit"]');
+        const originalButtonText = submitButton.innerHTML;
+        
+        // Mostrar estado de carregamento
+        submitButton.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Enviando...';
+        submitButton.disabled = true;
+        
+        try {
+          const response = await fetch('https://formsubmit.co/djeffdinanga1@gmail.com', {
+            method: 'POST',
+            body: formData
+          });
+          
+          if (response.ok) {
+            showToast('✨ Mensagem enviada com sucesso! Entraremos em contato em breve. ✨', 'success');
+            contactForm.reset(); // Limpa o formulário
+          } else {
+            throw new Error('Erro no envio');
+          }
+        } catch (error) {
+          console.error('Erro:', error);
+          showToast('❌ Erro ao enviar mensagem. Tente novamente mais tarde.', 'error');
+        } finally {
+          submitButton.innerHTML = originalButtonText;
+          submitButton.disabled = false;
+        }
       });
     }
 
     // Ano atual dinâmico
     document.getElementById('currentYear').innerText = new Date().getFullYear();
 
-    // Ativar link ativo no scroll com destaque sutil
+    // Ativar link ativo no scroll
     const sections = document.querySelectorAll("section[id]");
     function highlightNav() {
       let scrollY = window.scrollY;
@@ -682,7 +749,7 @@
     window.addEventListener("scroll", highlightNav);
     highlightNav();
 
-    // Pequeno efeito de entrada nos cards (aparência suave)
+    // Efeito de entrada nos cards
     const cards = document.querySelectorAll('.card, .trainer-card, .testimonial-card');
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
